@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Синхронізація часу</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --primary-dark: #564FD9;
+            --secondary: #4D44DB;
+            --text: #2D3748;
+            --text-light: #718096;
+            --background: #F7FAFC;
+            --card-bg: #FFFFFF;
+            --success: #48BB78;
+            --error: #F56565;
+            --border: #E2E8F0;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+        
+        .panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .panel-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(108, 99, 255, 0.2);
+        }
+        
+        .status-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            background-color: rgba(108, 99, 255, 0.08);
+            border-left: 4px solid var(--primary);
+            font-size: 1rem;
+        }
+        
+        .error-box {
+            background-color: rgba(245, 101, 101, 0.08);
+            border-left: 4px solid var(--error);
+            color: var(--error);
+        }
+        
+        .metrics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .metric-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(108, 99, 255, 0.1);
+        }
+        
+        .metric-title {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .metric-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .metric-unit {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-left: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            .metrics-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .metrics-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .panel {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Синхронізація часу</h1>
+        </header>
+        
+        <div class="panel">
+            <h2 class="panel-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 6V12L16 14" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Керування синхронізацією
+            </h2>
+            <button class="btn" onclick="syncTime()">Запустити синхронізацію</button>
+            <div id="timeOutput" class="status-box">Натисніть кнопку для початку синхронізації</div>
+            <div id="syncError" class="status-box"></div>
+        </div>
+        
+        <div class="panel">
+            <h2 class="panel-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 17V15M12 17V13M15 17V11M17 21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3H12.5858C12.851 3 13.1054 3.10536 13.2929 3.29289L18.7071 8.70711C18.8946 8.89464 19 9.149 19 9.41421V19C19 20.1046 18.1046 21 17 21Z" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Статистичні метрики
+            </h2>
+            <div id="output" class="metrics-container"></div>
+        </div>
+    </div>
+
+    <script src="/timesync/timesync.js"></script> 
+    <script src="script.js"></script>
+</body>
+</html>
