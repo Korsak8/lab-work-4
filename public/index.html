@@ -3,197 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Синхронізація часу</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Синхронізація часу з сервером</title>
     <style>
         :root {
-            --primary: #6C63FF;
-            --primary-dark: #564FD9;
-            --secondary: #4D44DB;
-            --text: #2D3748;
-            --text-light: #718096;
-            --background: #F7FAFC;
-            --card-bg: #FFFFFF;
-            --success: #48BB78;
-            --error: #F56565;
-            --border: #E2E8F0;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --secondary: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
         }
         
         body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--background);
-            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
+            color: var(--dark);
+            background-color: #f5f7fa;
+            margin: 0;
             padding: 20px;
-            min-height: 100vh;
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 800px;
             margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
         }
         
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+        h1, h2, h3 {
+            color: var(--primary-dark);
+            margin-top: 0;
         }
         
         h1 {
-            color: var(--primary);
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            color: var(--text-light);
-            font-size: 1.1rem;
-        }
-        
-        .panel {
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            padding: 25px;
-            margin-bottom: 25px;
-        }
-        
-        .panel-title {
-            font-size: 1.3rem;
-            color: var(--primary);
+            font-size: 28px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
         
-        .btn {
-            padding: 12px 24px;
-            font-size: 1rem;
-            font-weight: 600;
+        h1::before {
+            content: "⏱️";
+        }
+        
+        h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 8px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary);
+        }
+        
+        button {
             background-color: var(--primary);
             color: white;
             border: none;
+            padding: 12px 24px;
             border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .btn:hover {
+        button:hover {
             background-color: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(108, 99, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
         }
         
-        .status-box {
-            padding: 15px;
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button::before {
+            content: "🔄";
+        }
+        
+        .output {
+            background-color: #f8f9fa;
             border-radius: 8px;
-            margin: 15px 0;
-            background-color: rgba(108, 99, 255, 0.08);
-            border-left: 4px solid var(--primary);
-            font-size: 1rem;
+            padding: 15px;
+            font-family: 'Consolas', monospace;
+            white-space: pre;
+            overflow-x: auto;
+            margin-top: 15px;
+            border: 1px solid #e9ecef;
         }
         
-        .error-box {
-            background-color: rgba(245, 101, 101, 0.08);
-            border-left: 4px solid var(--error);
-            color: var(--error);
+        .error {
+            color: var(--danger);
+            background-color: rgba(231, 76, 60, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-weight: 500;
         }
         
-        .metrics-container {
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 15px;
             margin-top: 20px;
         }
         
-        .metric-card {
-            background: var(--card-bg);
+        .stat-item {
+            background: #f8f9fa;
+            padding: 12px;
             border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border);
-            transition: transform 0.3s ease;
+            text-align: center;
         }
         
-        .metric-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(108, 99, 255, 0.1);
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 5px;
         }
         
-        .metric-title {
-            font-size: 0.9rem;
-            color: var(--text-light);
-            margin-bottom: 8px;
-            font-weight: 500;
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-dark);
         }
         
-        .metric-value {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        
-        .metric-unit {
-            font-size: 0.8rem;
-            color: var(--text-light);
-            margin-left: 4px;
-        }
-        
-        @media (max-width: 768px) {
-            .metrics-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .metrics-container {
-                grid-template-columns: 1fr;
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
             }
             
-            .panel {
-                padding: 20px 15px;
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Синхронізація часу</h1>
-        </header>
+        <h1>Синхронізація часу з сервером</h1>
         
-        <div class="panel">
-            <h2 class="panel-title">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M12 6V12L16 14" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                Керування синхронізацією
-            </h2>
-            <button class="btn" onclick="syncTime()">Запустити синхронізацію</button>
-            <div id="timeOutput" class="status-box">Натисніть кнопку для початку синхронізації</div>
-            <div id="syncError" class="status-box"></div>
+        <div class="card">
+            <h2>Синхронізація</h2>
+            <button onclick="syncTime()">Синхронізувати час</button>
+            <div class="output" id="timeOutput">Натисніть кнопку для синхронізації.</div>
+            <div class="error" id="syncError"></div>
         </div>
         
-        <div class="panel">
-            <h2 class="panel-title">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 17V15M12 17V13M15 17V11M17 21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3H12.5858C12.851 3 13.1054 3.10536 13.2929 3.29289L18.7071 8.70711C18.8946 8.89464 19 9.149 19 9.41421V19C19 20.1046 18.1046 21 17 21Z" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                Статистичні метрики
-            </h2>
-            <div id="output" class="metrics-container"></div>
+        <div class="card">
+            <h2>Статистика</h2>
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-item">
+                    <div class="stat-label">Кількість спостережень</div>
+                    <div class="stat-value" id="countStat">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Поточна поправка</div>
+                    <div class="stat-value" id="offsetStat">0.00 мс</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Поточна похибка</div>
+                    <div class="stat-value" id="currentErrorStat">0.00 мс</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Похибка методу</div>
+                    <div class="stat-value" id="methodErrorStat">0.00 мс</div>
+                </div>
+            </div>
+            
+            <div class="output" id="output"></div>
         </div>
     </div>
 
-    <script src="/timesync/timesync.js"></script> 
+    <script src="/timesync/timesync.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

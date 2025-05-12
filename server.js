@@ -18,11 +18,11 @@ app.use('/timesync', timesyncServer.requestHandler);
 
 // Обробник WebSocket-з'єднань
 wss.on('connection', (ws) => {
-    console.log('🔗 Встановлено нове WebSocket-з’єднання');
+    console.log(' Встановлено нове WebSocket-з’єднання');
     
     // Подія: отримано повідомлення від клієнта
     ws.on('message', (message) => {
-        console.log(`📩 Отримано повідомлення: ${message}`);
+        console.log(`Отримано повідомлення: ${message}`);
         
         let data;
         try {
@@ -50,5 +50,5 @@ wss.on('connection', (ws) => {
 
 // Запуск сервера
 server.listen(PORT, () => {
-    console.log(`🚀 WebSocket-сервер запущено на http://localhost:${PORT}`);
+    console.log(`WebSocket-сервер запущено на http://localhost:${PORT}`);
 });
